@@ -27,15 +27,15 @@ class Tree {
     return innerbuild(uniqueSortedArray);
   }
   insert(value) {
-    const newnode = new node(value);
+    const newnode = new Node(value);
     if (!this.root) {
       this.root = newnode;
       return;
     }
 
-    current = this.root;
+    let current = this.root;
     while (true) {
-      if (value < current.value) {
+      if (value < current.data) {
         if (!current.left) {
           current.left = newnode;
           return;
@@ -62,7 +62,7 @@ class Tree {
         if (!node.right) {
           return node.left;
         }
-        if (!node.right && !node.right) {
+        if (!node.right && !node.left) {
           return null;
         }
         let tempnode = node.right;
@@ -104,6 +104,7 @@ class Tree {
     queue.push(this.root);
     while (queue.length > 0) {
       const node = queue.shift();
+      result.push(node.data);
       if (node.left) {
         queue.push(node.left);
       }
@@ -150,15 +151,15 @@ class Tree {
     if (!node) {
       return -1;
     }
-    const leftheight = height(node.left);
-    const rightheight = height(node.right);
+    const leftheight = this.height(node.left);
+    const rightheight = this.height(node.right);
 
     return Math.max(leftheight, rightheight) + 1;
   }
 
   depth(node) {
     let depth = 0;
-    current = this.root;
+    let current = this.root;
     while (current !== node) {
       depth++;
       if (node.data < current.data) {
@@ -174,8 +175,8 @@ class Tree {
     if (!node) {
       return true;
     }
-    const leftheight = height(node.left);
-    const rightheight = height(node.right);
+    const leftheight = this.height(node.left);
+    const rightheight = this.height(node.right);
     if (Math.abs(leftheight - rightheight) > 1) {
       return false;
     }
@@ -188,7 +189,12 @@ class Tree {
     return true;
   }
 
-  rebalance() {}
+  rebalance() {
+    const nodes = [];
+    this.inOrder((node) => nodes.push(node.data));
+
+    this.root = this.buildTree(nodes);
+  }
 }
 const prettyPrint = (node, prefix = "", isLeft = true) => {
   if (node === null) {
@@ -202,3 +208,40 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
     prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
   }
 };
+
+const getRandomNumbers = (count) => {
+  const numbers = [];
+  while (numbers.length < count) {
+    const random = Math.floor(Math.random() * 100);
+    if (!numbers.includes(random)) {
+      numbers.push(random);
+    }
+  }
+  return numbers;
+};
+
+const numbers = getRandomNumbers(8);
+const tree = new Tree(numbers);
+
+console.log("Initial tree:");
+prettyPrint(tree.root);
+console.log("Is balanced:", tree.isBalanced());
+tree.insert(101);
+tree.insert(102);
+tree.insert(103);
+console.log("Unbalanced tree:");
+prettyPrint(tree.root);
+console.log("Is balanced:", tree.isBalanced());
+tree.rebalance();
+
+console.log("Rebalanced tree:");
+prettyPrint(tree.root);
+
+console.log("Is balanced:", tree.isBalanced());
+console.log("Level Order:", tree.levelOrder().join(", "));
+console.log("Pre Order:");
+tree.preOrder((node) => console.log(node.data));
+console.log("Post Order:");
+tree.postOrder((node) => console.log(node.data));
+console.log("In Order:");
+tree.inOrder((node) => console.log(node.data));
