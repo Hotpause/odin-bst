@@ -127,6 +127,7 @@ class Tree {
     };
     traverse(this.root);
   }
+
   preOrder(callback) {
     const traverse = (node) => {
       if (node) {
